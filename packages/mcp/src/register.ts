@@ -19,6 +19,10 @@ import { passThroughValidator } from "./validator.js";
 /**
  * Both tools read and never write, always return the same answer for the same
  * arguments and window, and reach nothing outside this deployment.
+ *
+ * Each tool repeats its `title` inside `annotations`: the 2025-03-26 spec has
+ * no top-level tool `title`, so clients and checks built on it (including the
+ * Claude connector directory check) read it only from there.
  */
 const READ_ONLY = {
   readOnlyHint: true,
@@ -67,6 +71,12 @@ export interface RegisterToolsOptions extends ToolContext {
   }) => void;
 }
 
+/**
+ * Registers the `query` and `metrics_discover` tools on `server`.
+ *
+ * Every call reports to `opts.onToolCall` exactly once, including a call whose
+ * tool throws, which is returned as a structured error rather than rethrown.
+ */
 export function registerTools(
   server: McpServer,
   opts: RegisterToolsOptions
@@ -127,7 +137,7 @@ export function registerTools(
         QUERY_TOOL_INPUT_SCHEMA,
         passThroughValidator
       ),
-      annotations: READ_ONLY,
+      annotations: { ...READ_ONLY, title: "Query telemetry" },
     },
     async (input: unknown) => call("query", () => runQueryTool(input, opts))
   );
@@ -141,7 +151,7 @@ export function registerTools(
         METRICS_DISCOVER_TOOL_INPUT_SCHEMA,
         passThroughValidator
       ),
-      annotations: READ_ONLY,
+      annotations: { ...READ_ONLY, title: "Discover metrics" },
     },
     async () => call("metrics_discover", () => runMetricsDiscoverTool(opts))
   );
