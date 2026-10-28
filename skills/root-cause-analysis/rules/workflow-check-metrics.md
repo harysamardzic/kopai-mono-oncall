@@ -18,7 +18,7 @@ inflection (`5m`). `errorRate` counts errors server-side; result rows still repo
 `Duration` in **nanoseconds**, so `avg`/`max` come back in ns.
 
 ```ts
-import { kq, KopaiQueryBuildError } from "@kopai/sdk";
+import { kq, KopaiError, KopaiQueryBuildError } from "@kopai/sdk";
 // const client = clientFromConfig();
 
 try {
@@ -82,7 +82,18 @@ The MetricType is a **builder argument**: `kq.metrics("<Type>")` auto-pins it, w
 type is one of `"Gauge"`/`"Sum"`/`"Histogram"`/`"ExponentialHistogram"`/`"Summary"`. Value
 columns are typed per type: `"Value"` for `Gauge`/`Sum`; `Count`/`Sum`/`Min`/`Max` for
 `Histogram`/`ExponentialHistogram`; `Count`/`Sum` for `Summary`. Bucket with
-`.timeSeries()` to align the metric's onset against the trace onset from (a).
+`.timeSeries()` to align the metric's onset against the trace onset from (a). Read a counter
+with `rate`/`increase` (ClickHouse-only; the `IsMonotonic` filter is required), not `avg`.
+On SQLite `rate` is refused with a 400, and the fallback depends on the counter's
+temporality; filter on `AggregationTemporality` to split them:
+
+- **Delta (`1`):** each `Value` is the increase since the previous point, so
+  `sum("Value")` per bucket is the growth, and it adds up across series.
+- **Cumulative (`2`):** each `Value` is a running total, and SQLite cannot give the total
+  growth across series. Work per series only: `.dimension()` by the attributes that
+  identify one series (e.g. `service.instance.id`), take `max("Value")` per bucket, and
+  compare neighbouring buckets within each series; a drop means a restart. Never compare
+  maxima across series.
 
 ```ts
 const NAME = "http.server.errors"; // from discoverMetrics()
@@ -90,8 +101,9 @@ try {
   const q = kq
     .metrics("Sum")
     .aggregate()
-    .measure((m) => m.avg("Value", "v"))
+    .measure((m) => m.rate("Value", "per_s"))
     .where((f) => f.eq("MetricName", NAME))
+    .where((f) => f.eq("IsMonotonic", true))
     .timeRelative("1h")
     .timeSeries("1m")
     .build();
@@ -99,6 +111,12 @@ try {
   console.log(JSON.stringify(data, null, 2));
 } catch (e) {
   if (e instanceof KopaiQueryBuildError) console.error(e.issues);
+  else if (
+    e instanceof KopaiError &&
+    e.status === 400 &&
+    e.message.includes("ClickHouse backend only")
+  )
+    console.error("rate needs ClickHouse; use the SQLite fallback above");
   else throw e;
 }
 ```
@@ -106,10 +124,11 @@ try {
 ### Which signal to read
 
 - **Error rate / counts** → trace `errorRate` measure (a), or a `Sum` metric like
-  `http.server.errors` (c). Use `kq.metrics("Sum")`, aggregate `Value`.
+  `http.server.errors` (c). Use `kq.metrics("Sum")` with `rate("Value", …)`.
 - **Latency** → trace `avg`/`max` of `Duration` (portable); `p95`/`p99` only on
-  ClickHouse. For a metric-side view use `kq.metrics("Histogram")` and aggregate
-  `Count`/`Sum`/`Max`.
+  ClickHouse. For a metric-side view use `kq.metrics("Histogram")` with
+  `histogramQuantile(0.95, …)` (report only the value, e.g. "p95 ≈ 430 ms", or "p95 > 430 ms" when `_high` is null) and
+  `rate("Count", …)` for request rate.
 - **Resource saturation** (CPU, memory, connections) → point-in-time `Gauge`. Use
   `kq.metrics("Gauge")`, aggregate `Value` (`avg`/`max`), `.dimension("host.name")` for
   per-host spread.
