@@ -30,5 +30,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Check Claude plugin skill copies
+        run: node scripts/sync-plugin-skills.mjs --check
+
       - name: Build, lint, type-check, test
         run: pnpm turbo build lint type-check test

@@ -46,6 +46,20 @@ The image is built on [Docker Hardened Images](https://hub.docker.com/hardened-i
 
 `npx skills add kopai-app/kopai-mono` installs Kopai's agent skills from [`skills/`](./skills); see [kopai.app/skills](https://kopai.app/skills) for what each one does.
 
+## Claude plugins
+
+This repository is also a Claude plugin marketplace with two plugins, each bundling the Kopai MCP server with skills:
+
+- [`kopai-oncall`](./plugins/kopai-oncall): puts Claude on call with your team in Claude Tag or Claude Code, triaging alerts and verifying fixes with Kopai data. Read-only by design.
+- [`kopai-dev`](./plugins/kopai-dev): OpenTelemetry instrumentation and Kopai dashboards.
+
+```bash
+claude plugin marketplace add kopai-app/kopai-mono
+claude plugin install kopai-oncall@kopai
+```
+
+The plugins' copies of the skills in `skills/` are generated: edit `skills/`, then run `pnpm plugins:sync`.
+
 ## Packages
 
 | Package                                                          | Description                     | Version                                                                                                                                      |

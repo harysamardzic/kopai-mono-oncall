@@ -21,7 +21,9 @@
     "changeset": "changeset",
     "version": "changeset version",
     "release": "pnpm build && changeset publish",
-    "test:publish": "./scripts/test-publish.sh"
+    "test:publish": "./scripts/test-publish.sh",
+    "plugins:sync": "node scripts/sync-plugin-skills.mjs",
+    "plugins:check": "node scripts/sync-plugin-skills.mjs --check"
   },
   "devDependencies": {
     "@changesets/cli": "^3.0.3",
