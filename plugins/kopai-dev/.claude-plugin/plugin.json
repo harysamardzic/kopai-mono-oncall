@@ -1,0 +1,19 @@
+{
+  "name": "kopai-dev",
+  "displayName": "Kopai Dev",
+  "version": "0.1.0",
+  "description": "Instrument apps with OpenTelemetry, validate the telemetry against Kopai, and build Kopai dashboards.",
+  "author": {
+    "name": "Kopai",
+    "url": "https://kopai.app"
+  },
+  "homepage": "https://kopai.app",
+  "repository": "https://github.com/kopai-app/kopai-mono",
+  "license": "Apache-2.0",
+  "keywords": [
+    "opentelemetry",
+    "observability",
+    "instrumentation",
+    "dashboards"
+  ]
+}

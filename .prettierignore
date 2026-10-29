@@ -1,1 +1,7 @@
 pnpm-lock.yaml
+
+# Generated copies of skills/ (scripts/sync-plugin-skills.mjs). Format the
+# originals in skills/ instead, then re-sync.
+plugins/kopai-oncall/skills/root-cause-analysis
+plugins/kopai-oncall/skills/create-live-page
+plugins/kopai-dev/skills
