@@ -80,6 +80,18 @@ And step 3, the logs of one trace:
 For an incident, prefer an `absolute` window (`startTime`/`endTime`, ISO
 datetimes) over `relative`, so the evidence you cite doesn't slide.
 
+Differences from the SDK in connector mode:
+
+- `Duration` comparisons (`gt`, `lte`, …) take a number of nanoseconds,
+  not a string like `"1s"`: `{ "column": "Duration", "op": "gt", "value": 1000000000 }`.
+- Row caps are 200 in `raw` mode and 500 in `aggregate` mode (buckets ×
+  groups for a time series). An over-cap result is refused, not
+  truncated: narrow the window, coarsen the granularity, or filter groups.
+- There is no compile-time check on values: `"ERROR"` or `"SERVER"`
+  silently match nothing. Use the exact values (`"Error"`, `"Server"`,
+  `"Client"`), and treat an unexpected zero as a wrong value first.
+- A time series has no row for a bucket with no data.
+
 **Credentials.** In connector mode Claude never handles a Kopai token. In a
 Claude Tag channel, Kopai access is a credential the admin attached to the
 channel, applied outside the sandbox. Never ask anyone to paste a token

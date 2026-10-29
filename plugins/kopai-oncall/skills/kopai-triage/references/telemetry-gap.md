@@ -47,8 +47,10 @@ is easy to miss and expensive when it is real.
    }
    ```
 
-   Compare with `BASELINES.md`. Did one signal stop, or all of them? One
-   service, or every service?
+   A time series has no row for a bucket with no data, so a service that
+   went silent shows a series that just stops: compare the last
+   `bucket_start` with the window end. Compare with `BASELINES.md`. Did one
+   signal stop, or all of them? One service, or every service?
 
 3. **Is the service actually serving?** Check outside Kopai: load
    balancer health, callers' client spans to it (do callers still see

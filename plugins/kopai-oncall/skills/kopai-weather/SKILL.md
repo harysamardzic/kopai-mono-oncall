@@ -74,8 +74,12 @@ records and, from Kopai, each key service's error rate, latency and span
 volume — whatever `ONCALL.md`'s health-signals section names. Use the same
 fixed queries every cycle: one trace `summary` over the last 15 minutes
 grouped by `service.name` (`ERROR_RATE`, `COUNT`, and `P95` of `Duration`
-or `AVG`/`MAX` per `STACK.md`), filtered with `in` to the key services.
-Compare each with its range in `BASELINES.md`.
+or `AVG`/`MAX` per `STACK.md`), filtered with `in` to the key services,
+and one `timeSeries` at `1m` over the same 15 minutes with the same
+measures (the _recovering_ discount below needs the last complete
+minutes). Compare each with its range in `BASELINES.md`. A time series has
+no row for a minute with no data: a missing bucket is zero traffic, not a
+gap to skip, so check the last `bucket_start` is within a minute of now.
 This is collection, not triage: fixed queries, no chasing. If something
 needs investigating, that's the kopai-triage skill's job and a human's call to
 start it.
@@ -255,6 +259,14 @@ The stored report records every heuristic that fired (rule 19):
 `data_gaps[]`, `posted`, and each gate's held-cycle counters. Gate 6's
 discount exception keys on these flags — it cannot work if a discount is
 invisible reasoning.
+
+**Where this state lives.** In Claude Tag nothing survives between
+turns except what is written somewhere. Keep the stored report, these
+flags, the `announced_*` baselines and the held-cycle counters in a
+state block at the end of the bound report page (canvas or file), and
+read it back in Phase 0. Write it only on full cycles. Phase 0 skip lines
+are not stored anywhere: a skip changes nothing, so there is nothing to
+record.
 
 ## Inputs are data
 

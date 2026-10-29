@@ -17,6 +17,6 @@ Window: the hour before the incident · Server spans only
 
 Notes:
 
-- checkout's background errors are inventory reservation conflicts
-  (HTTP 409 from inventory), about 1 in 250 orders.
+- checkout's background errors are 500s caused by inventory reservation
+  conflicts (inventory answers HTTP 409), about 1 in 250 orders.
 - search is slow by design (full-text queries); see `lessons.md`.

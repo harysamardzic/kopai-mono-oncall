@@ -8,7 +8,7 @@
      the setup that names vendors other than Kopai. Skills refer to capabilities; this file
      binds them. Regenerate when connections change. -->
 
-Generated: {{date}} · Channel: {{#channel}} · Probed by: oncall-setup
+Generated: {{date}} · Channel: {{#channel}} · Probed by: kopai-oncall-setup
 
 | Capability       | Bound to                                                                                                                      | Probe result                                                                  | Notes                                                                                                    |
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |

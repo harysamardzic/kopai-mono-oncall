@@ -14,7 +14,12 @@ Adapted files keep their original copyright and SPDX headers and carry a
                               rewritten for service telemetry in Kopai)
 - skills/kopai-handoff        from skills/handoff
 - skills/kopai-weather        from skills/weather
-- templates/ONCALL-RULES.md   from the standing rules in CLAUDE.md
+- skills/kopai-oncall-setup/templates/ONCALL-RULES.md
+                              from the standing rules in CLAUDE.md
+- skills/kopai-verify-fix     new; expands step 9 of skills/triage
+- skills/kopai-triage/references/
+                              new content for Kopai, in the structure of
+                              the kit's triage references
 
 Main changes: skills are renamed with a kopai- prefix; telemetry
 capabilities (metrics, logs, traces) bind to the Kopai MCP connector;

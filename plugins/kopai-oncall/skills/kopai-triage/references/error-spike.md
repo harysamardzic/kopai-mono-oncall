@@ -24,8 +24,9 @@
 Windows below are `absolute`, from about 2h before onset to now. Replace
 `<start>` and `<end>` with ISO datetimes.
 
-1. **Scope it.** Which services, how bad, since when? Rank by error count,
-   not rate, so a service with one failed span doesn't top the list:
+1. **Scope it.** Which services, how bad, since when? Rank by error rate,
+   but only over services with real traffic (the `havings` line), so a
+   service with one failed span out of three doesn't top the list:
 
    ```json
    {
@@ -41,6 +42,7 @@ Windows below are `absolute`, from about 2h before onset to now. Replace
        "startTime": "<start>",
        "endTime": "<end>"
      },
+     "havings": [{ "measure": "spans", "op": "gte", "value": 50 }],
      "output": { "type": "summary" },
      "orderBy": [
        { "type": "measure", "alias": "error_rate", "direction": "desc" }

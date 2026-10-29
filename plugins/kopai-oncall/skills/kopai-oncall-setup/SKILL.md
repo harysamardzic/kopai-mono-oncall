@@ -52,13 +52,13 @@ field names, row caps and the aggregate cap.
 
 Determine which phase you're in by what exists on disk:
 
-| If                                                             | Phase         |
-| -------------------------------------------------------------- | ------------- |
-| No `STACK.md`                                                  | 0 — Discover  |
-| `STACK.md` exists, no draft playbooks in `playbooks/`          | 1 — Mine      |
-| Drafts exist, `ONCALL.md` has unfilled `{{...}}` policy blanks | 2 — Interview |
-| `ONCALL.md` complete, no `eval/replay-results.md`              | 3 — Validate  |
-| Replay passed, routines not yet installed                      | 4 — Install   |
+| If                                                                                     | Phase         |
+| -------------------------------------------------------------------------------------- | ------------- |
+| No `STACK.md`                                                                          | 0 — Discover  |
+| `STACK.md` exists, no draft playbooks in `playbooks/`                                  | 1 — Mine      |
+| Drafts exist in `playbooks/`, and `ONCALL.md` is missing or still has `{{...}}` blanks | 2 — Interview |
+| `ONCALL.md` complete, no `eval/replay-results.md`                                      | 3 — Validate  |
+| Replay passed, routines not yet installed                                              | 4 — Install   |
 
 **Open every phase with the same four-line briefing — it is the FIRST text
 of the phase's first reply, before any tool call, every phase including
@@ -180,8 +180,9 @@ blank page.
      are available, otherwise `AVG` and `MAX`. Label each with what it is.
      `Duration` is in nanoseconds.
    - error-level log volume per hour (`SeverityNumber` `gte` 17).
-     Respect the aggregate cap: 7 days at `1h` is 168 buckets per service,
-     so query one service (or a few with `in`) at a time. Write the results
+     Respect the aggregate cap (500 rows; an over-cap result is refused,
+     not truncated): 7 days at `1h` is up to 169 buckets per service, so
+     query at most 2 services per call at `1h`, or use `6h` for the shape. Write the results
      to `BASELINES.md` in the team's repo: one section per service, the
      window and query date at the top, and a note wherever the data was
      too thin to call a baseline. This file feeds the Interview's
@@ -424,6 +425,10 @@ this channel?`, have it read `ONCALL.md` back, and have it run one Kopai
    change how/policy, PR {{repo}}"). Humans install routines; you keep
    this registry current whenever standing work changes, so what's
    running is legible at a glance to anyone who joins the channel.
+   2b. **Pin a policy digest.** Post and pin a short digest of `ONCALL.md`:
+   the paging criteria, the routing tree, the escalation fallback, and
+   the date. It is what degraded mode reads when the repo is unreachable
+   (ONCALL-RULES.md rule 7a). Update it whenever `ONCALL.md` changes.
 3. The human pastes each routine into the channel (routines belong to the
    channel and its members — you don't install standing work for a team
    without them seeing exactly what it says).

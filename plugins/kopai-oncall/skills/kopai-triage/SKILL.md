@@ -146,7 +146,7 @@ inside subagents too). Each returns the fixed shape:
 - **FOUND:** observations with timestamps — observations, never root
   causes
 - **NOT FOUND:** what was looked for and absent — absence counts only
-  if the run/window was complete
+  if the time window was complete
 - **CANNOT ACCESS:** anything that 403'd or timed out (surfaces in the
   diagnosis as a gap, never silently dropped)
 
@@ -160,11 +160,12 @@ for a morning-log item.
    before promoting it (rule 5).
 
 5a. **Cross-check blame against "still happening"** (ONCALL-RULES.md rule 5a).
-A blame verdict — bisect, revert notice, "that PR broke it" — names
+A blame verdict — a deploy lined up with onset, a rollback notice,
+"that PR broke it" — names
 the change that _started_ the failure; before naming it as the live
-cause, confirm the symptom appears in the most recent **completed**
-run/window. Presence always confirms red; absence confirms green only
-on a completed run.
+cause, confirm the symptom appears in the most recent **complete**
+time bucket or window. Presence always confirms red; absence confirms
+green only on a complete bucket.
 
 6. **Post the diagnosis** in this format, in-thread:
 
@@ -184,6 +185,15 @@ been tried → where it stands, one sentence. Then the delta. Ruled-out
 hypotheses don't reappear unless load-bearing. **Never post a "no
 change" update** — silence is a valid state, and noise trains readers
 to skip your updates.
+
+6b. **Decide page or no page, and log it** (rules 3 and 3a). Evaluate the
+paging criteria in `ONCALL.md` against what you measured: the signal,
+its value, the sustain window, any exemption. If a criterion trips,
+page through the `pager` binding; with no pager bound, or if the page
+call fails, use the fallback `ONCALL.md` names, and never improvise
+one. Either way, append the decision to `paging-log.md` in its entry
+format, with the values and the clause that decided it. Follow the
+acknowledgment ladder in `ONCALL.md` only as far as it is written.
 
 7. **Route.** If `ONCALL.md`'s routing tree names an owner for this class,
    mention them. Otherwise mention no one (rule 12).

@@ -41,12 +41,12 @@ rules when deciding what to _report_:
 - **Stale takes three legs, never silence alone:** (1) the record/thread
   quiet ≥ {{24h}}; (2) nothing in the alert channels naming it in the last
   hour; (3) its specific symptom absent from current data — and leg 3
-  only counts if the relevant run/window actually _completed_ ("not
-  failing yet" ≠ "passing"). If your checks can't see the incident's
+  only counts if the relevant time window is complete (a bucket still
+  filling proves nothing). If your checks can't see the incident's
   actual symptom, don't call it stale — a healthy proxy covers only the
   path it measures ("checkouts are flowing" proves the checkout path, not
   the whole payment provider). Every "looks stale" nudge carries its
-  one-line evidence ("thread quiet 26h; merges flowing; no related
+  one-line evidence ("thread quiet 26h; checkouts flowing; no related
   alerts").
 - **Promotions climb a ladder; demotions don't.** Suggesting a stale or
   closed incident is live again requires evidence **newer than the
@@ -181,8 +181,10 @@ write logged to lessons.md; credential noted in STACK.md)}}.
 ## Read-only guarantee
 
 This agent never changes the state of any monitored system. Its only
-outputs are: messages in the channel; entries in the repo's log files
-(`lessons.md`, `paging-log.md`, `eval/shadow-log.md`); updates to the
+outputs are: messages in the channel; entries in this repo's log and
+record files (`lessons.md`, `paging-log.md`, `eval/shadow-log.md`,
+`alert-coverage.md`, and the setup-owned `STACK.md` and `BASELINES.md`);
+updates to the
 bound weather report page (only if opted in above); proposed diffs as
 PRs; and (where a pager is bound) pages. There is no allowlist
 and nothing to configure in this section — it exists so every reader of
@@ -195,7 +197,7 @@ from the open incident records plus these health signals: {{e.g.
 error rate and p95 latency of the top services in Kopai, open incidents}}.
 Fresh-reader rules apply (ONCALL-RULES.md rule 10).
 
-Opt-in: the `kopai-weather` skill (routine 6 in `templates/routines.md`) — an
+Opt-in: the `kopai-weather` skill (routine 6 in the plugin's routines template, which setup filled in for this repo) — an
 event-gated standing report. {{not opted in (default) / opted in on
 {{date}}; report page: {{canvas link / repo file}}; cadence targets set
 in Interview}}.
@@ -203,12 +205,15 @@ in Interview}}.
 If opted in, the mood tier boundaries — set in Interview, read by the
 weather skill, never invented by it (ONCALL-RULES.md rule 15):
 
-| Tier          | {{base signal 1, e.g. worst service error rate vs. baseline}} | {{base signal 2, e.g. open incidents}} |
-| ------------- | ------------------------------------------------------------- | -------------------------------------- |
-| sunny         | {{all services within baseline}}                              | {{none open}}                          |
-| partly_cloudy | {{one service above baseline < 30 min}}                       | {{one open, not page-severity}}        |
-| overcast      | {{above baseline 30 min–2h, or two services}}                 | {{one page-severity open}}             |
-| stormy        | {{above paging threshold > 2h}}                               | {{two or more page-severity open}}     |
+| Tier          | {{base signal 1, e.g. worst key service error rate vs. baseline}} | {{base signal 2, e.g. worst key service latency vs. baseline}} |
+| ------------- | ----------------------------------------------------------------- | -------------------------------------------------------------- |
+| sunny         | {{all within baseline}}                                           | {{all within baseline}}                                        |
+| partly_cloudy | {{one service above baseline < 30 min}}                           | {{one service above baseline < 30 min}}                        |
+| overcast      | {{above baseline 30 min–2h, or two services}}                     | {{above baseline 30 min–2h, or two services}}                  |
+| stormy        | {{above its paging threshold}}                                    | {{above its paging threshold}}                                 |
+
+Open incidents are not a base signal: the weather skill applies them last,
+as a bounded modifier.
 
 ## Handoff and sitreps
 

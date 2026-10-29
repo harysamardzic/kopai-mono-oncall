@@ -105,7 +105,7 @@ than any single diagnosis:
 
 - **On-call health** — incidents and pages week over week, split
   business-hours vs. off-hours, plus false pages. Produced as a required
-  section of every weekly handoff (see `the kopai-handoff skill`), so measurement
+  section of every weekly handoff (see the kopai-handoff skill), so measurement
   costs nothing extra. The paging audit trail (ONCALL-RULES.md rule 3a) is the
   raw data.
 - **A rubber-stamp fraction** — of the week's diagnoses, how many did a
@@ -116,7 +116,7 @@ than any single diagnosis:
   diagnosis — this number is the only early warning that the team has
   stopped cross-examining.
 - **A "bad change escaped" counter** — whatever your team's equivalent is
-  of "PRs reverted because a bad merge got through" — trended on a
+  of "deploys rolled back because a bad change got through" — trended on a
   dashboard humans already look at. This is the north-star number: it
   measures whether faster triage is actually protecting the system.
 

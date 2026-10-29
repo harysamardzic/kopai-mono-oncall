@@ -47,7 +47,7 @@ incidents carry one of four states. `active` and `stale` are both open.
 **Stale is a nudge, never a closure.** It means Claude found three
 independent signs of abandonment — the thread quiet past the policy
 window, nothing naming the incident in the alert feed, and the symptom
-absent from the latest _finished_ run — and is asking you to close the
+absent from the latest complete time window — and is asking you to close the
 incident or post an update. Every stale flag carries its evidence
 one-liner, so disputing it is cheap. `mitigated` (fix in, still watching)
 and `resolved` (done) are closed — and only humans close incidents or
@@ -110,6 +110,8 @@ alerts, or threads.
 
 ## Want the deeper story?
 
-the kopai-oncall plugin's README (how this was built and why), `ONCALL.md` (the policy —
+the kopai-oncall plugin's README at
+<https://github.com/kopai-app/kopai-mono/tree/main/plugins/kopai-oncall>
+(how this was built and why), `ONCALL.md` (the policy —
 thresholds, routing, escalation), `lessons.md` (everything we've learned,
 newest first).

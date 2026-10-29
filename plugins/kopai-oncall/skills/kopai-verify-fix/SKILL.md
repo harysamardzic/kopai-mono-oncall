@@ -57,9 +57,11 @@ missing.
    15 minutes before the fix to now. Do not poll in between unless a human
    asks for tighter watching.
 
-   In Claude Tag, schedule the later checks as one-off routines in this
-   thread ("check again at 14:25"). In a local session, tell the human
-   when to ask again rather than waiting in a loop.
+   In Claude Tag, the later checks can be one-off follow-ups in this
+   thread ("check again at 14:25"). Say in the thread exactly when each
+   will run. They end once they fire, so they are not standing work and
+   need no entry in the routine registry. In a local session, tell the
+   human when to ask again rather than waiting in a loop.
 
 3. **Judge each checkpoint against the baseline:**
 
@@ -70,7 +72,11 @@ missing.
    | No better than before the fix                             | **Not working**: say so plainly                                                                  |
    | Fewer rows or less volume than baseline                   | **Cannot confirm**: a quiet signal is not a healthy one. Check span `COUNT` before anything else |
 
-   Use only complete buckets: the current minute is still filling.
+   Use only complete buckets: the current minute is still filling. A
+   time series has no row for a minute with no data, so a series that
+   simply stops looks like healthy old buckets: check that the last
+   `bucket_start` is within one granularity of now before trusting
+   "the last 3 buckets".
    Volume matters too: an error rate back to normal on a tenth of the
    usual traffic means the service may not be serving.
 

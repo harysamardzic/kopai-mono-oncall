@@ -55,9 +55,9 @@ trail — so no future session re-walks the same dead ends):
 
 When a tag accumulates **3 entries with the same mechanism**, or an entry
 stops being a story and becomes a _procedure_ (a checklist someone could
-follow cold), promote it into that class's reference file by PR
+follow cold), promote it into that class's playbook (`playbooks/<class>.md`) by PR
 (ONCALL-RULES.md rule 9) and replace the entries with one pointer line. Record
-the promotion itself as an entry — the reference file's provenance points
+the promotion itself as an entry — the playbook's provenance points
 back here.
 
 ---
@@ -95,8 +95,7 @@ back here.
   load balancer unchanged (link).
 - Confidence: medium that payments' exporter lost its endpoint after the
   09:38 config change; the one thing that would change my mind is
-  collector-side drops at 09:40. (Graduated into the kopai-triage skill's
-  `references/telemetry-gap.md`.)
+  collector-side drops at 09:40. (Graduated into `playbooks/telemetry-gap.md`.)
 
 ## 2026-06-14 · Example: theorized from config instead of checking metrics · #process · thread-link
 
