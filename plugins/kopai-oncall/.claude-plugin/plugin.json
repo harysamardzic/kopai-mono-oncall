@@ -1,7 +1,7 @@
 {
   "name": "kopai-oncall",
   "displayName": "Kopai On-Call",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Put Claude on call with Kopai: triage alerts from your OpenTelemetry traces, logs and metrics, verify fixes against baseline, and write sitreps, handoffs and status reports. Read-only by design.",
   "author": {
     "name": "Kopai",
