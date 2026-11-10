@@ -1,113 +1,171 @@
 <!-- Copyright 2026 Anthropic PBC -->
 <!-- SPDX-License-Identifier: Apache-2.0 -->
-<!-- Modified for Kopai, 2026: adds the Kopai connection and the
-     kopai-oncall plugin to what the Owner sets up. -->
+<!-- Modified for Kopai, 2026: rewritten around Kopai's onboarding: the
+     Slack target, an agent token in a Bearer custom connector, the `kopai`
+     bundle, the channel setup and the test message; keeps the admin
+     message, the verification and the gotchas. -->
 
 # Getting Claude Tag ready for Kopai on-call
 
-Claude Tag is @Claude living in your Slack channels. It's new, so this
-page spells out what _you_ can do yourself, what only your **Claude org
-Owner** can do, and what to send them.
-Do this before setup Phase 4 (setup's Phase 0 will remind you). If you
-want to run setup from the channel from the start, do it before Phase 0.
+Claude Tag is @Claude living in your Slack channels. This page is the
+whole onboarding: what a **Kopai owner or admin** does, what only a
+**Claude admin** can do, and the two steps anyone does in the channel.
 
-## What you need to know in one paragraph
+## Connect Kopai with an agent token, not by signing in
 
-Claude Tag is available on Claude Team and Enterprise plans. It starts
-with **no access to anything** — an Owner
-provisions it an identity with its own service-account credentials (an
-"access bundle"), scoped to your workspace or specific channels. Channel
-work bills to an org usage balance with a spend limit, not to your seat.
-Full docs: [setup overview](https://claude.com/docs/claude-tag/admins/setup-overview) ·
-[how it works](https://claude.com/docs/claude-tag/concepts/how-it-works) ·
-[the identity model](https://claude.com/blog/agent-identity-access-model).
+Anthropic's guidance for every tool Claude Tag reaches:
 
-## What you can do yourself (no admin needed)
+> The credential you connect is Claude's account in that tool, not yours.
+> Anyone in a channel where the connector applies can use it through
+> Claude, so connect a dedicated identity you control rather than your
+> personal login.
 
-- `/invite @Claude` into your on-call channel and each alert channel you
-  want watched (once the app is installed in the workspace).
-- Check what it can reach: `@Claude what can you access from this channel?`
-  — or click **Configure** in the footer of any Claude reply.
-- Create, list, edit, and disable routines in the channel ("what routines
-  are set up here?").
-- Run setup Phases 0–3 from a local Claude Code session in the on-call
-  repo, with the kopai-oncall plugin enabled, before Tag is provisioned at
-  all.
-- Create a Kopai service-account key for Claude in the Kopai dashboard
-  (read-only), ready to hand to the Owner. Never paste it into Slack.
+If a Claude admin connects Kopai by signing in (the **MCP Connector**
+credential type), everyone in the channel queries Kopai as that admin,
+with their role. Connect Kopai with an **`agent` token** instead: a Kopai
+workspace token made for Claude, which can read and never change anything
+unless an owner gives it one grant (below). The plugin points at
+`https://api.kopai.app/v2/mcp` and holds no credential; never paste a
+token into Slack.
 
-## What only an Owner can do
+## The steps
 
-At [claude.ai/admin-settings/claude-tag](https://claude.ai/admin-settings/claude-tag)
-(must be an **Owner** in the Claude org — an Admin can view but not
-complete setup):
+1. **Kopai › Alerting › Slack** (a Kopai owner or admin): **Add to Slack**,
+   choosing the alert channel. Kopai posts its alerts there.
+2. **Kopai › Tokens** (a Kopai owner or admin): create an **`agent` token**
+   for Claude Tag. Only if the team wants Claude to create rules a person
+   approved in the thread, a Kopai **owner** switches on **"may create
+   alert rules"** on it. Claude can never change, pause or delete a rule
+   with it, and Kopai caps its creations per workspace per day.
+3. **Claude › Organization settings › Claude Tag › Bundles** (a Claude org
+   **Owner**, or a **Claude Tag Admin** on Enterprise): create a bundle
+   named **`kopai`** with:
+   - a **Custom connector → Bearer**, Allowed websites `api.kopai.app`,
+     holding the agent token. If someone else holds the token, use **Copy
+     setup link for another admin**: they paste it into Claude's form and
+     you approve it under **Notifications → Requests**. Don't add a path
+     prefix: setup links don't carry one.
+   - the **`kopai-oncall` plugin** (see "Getting the plugin" below);
+   - **Instructions**, with this text:
 
-1. Pair the Slack workspace with the Claude organization.
-2. Create Claude Tag's identity and access bundle.
-3. Attach connections — at minimum: **Kopai** (the service-account key,
-   with `api.kopai.app` as its allowed website), the **code host** (with
-   the on-call repo included, writable so Claude can commit log entries
-   and open PRs), and optionally your **pager** and any other metrics or
-   log tool you use alongside Kopai. Read-only credentials everywhere to start; see
-   [add connections](https://claude.com/docs/claude-tag/admins/add-connections)
-   for credential types per service.
-4. Attach the **kopai-oncall** plugin to the same bundle (register the
-   Kopai plugin repository as an organization plugin source first if it
-   isn't listed), then scope the bundle to your on-call channel (and
-   workspace, if desired).
-5. Fund the usage balance and
-   [set a spend limit](https://claude.com/docs/claude-tag/admins/set-spend-limit)
-   for the pilot.
+     > Kopai is this team's observability backend (traces, logs, metrics,
+     > alerts) at api.kopai.app; authentication is already set up. Kopai
+     > alert posts in this channel come from Kopai's Slack app. Use the
+     > kopai-oncall skills for anything about alerts, alert rules or
+     > telemetry. Never create or change an alert rule without a person's
+     > approval of that exact rule in the thread.
 
-## The message to send your admin
+   - **Where it applies:** the alert channel.
+4. **Slack, the alert channel** (anyone): `/invite @Claude` if it isn't
+   there yet, then post a **top-level** message: `@Claude set up Kopai
+on-call here`. Claude checks it can reach Kopai, proposes the watch
+   routine, and creates it when you say yes.
+5. **Kopai › Alerting › Slack** (anyone with access): press **Send test
+   message**. Claude answers it in its thread with a health check: the
+   identity in use, the alert rules it sees, the last alert, and that the
+   watch is running. That reply means onboarding worked.
+6. Optional: each person who wants to create, change or pause rules as
+   themselves connects Kopai on their own claude.ai account. Claude asks
+   them to allow it the first time; their changes are made as them.
 
-Paste this to whoever owns your Claude org, filling the blanks:
+Without steps 3–5 the plugin still works on request: anyone with their own
+Kopai connector can ask `@Claude triage this` in a thread. Routines use
+only the channel's own access, so nothing is triaged on its own until the
+`kopai` bundle applies.
 
-> Hi — our team is setting up a Claude-assisted on-call in
-> **#{{on-call channel}}** using Kopai's on-call plugin for Claude
-> (kopai-oncall). Could you do the one-time Claude Tag provisioning for us?
+## Getting the plugin
+
+- **Preferred:** from the Claude Directory listing (Kopai's connector and
+  plugin), then add `kopai-oncall` to the `kopai` bundle.
+- **Fallbacks:** a private fork of `kopai-app/kopai-claude-plugins` added as a
+  skills repository, with the Claude GitHub App linked to it; or upload
+  the plugin's folder as a zip from the console.
+
+## Don't
+
+- **Don't put the connector on the Connectors tab.** A credential there
+  is on in every channel; the bundle limits it to the alert channel.
+- **Don't use an MCP Connector sign-in** for Kopai in these channels: it
+  shares the signer's Kopai role with everyone in them. Remove any that
+  applies. The one sanctioned sign-in is a dedicated, non-admin Kopai user
+  for Claude (for example `claude@yourcompany`), used _instead of_ the
+  token, never alongside it.
+- **Don't use a Slack Connect channel** (shared with another
+  organization): it is not supported.
+
+**Incident channels (optional).** An Owner can also apply the `kopai`
+bundle to your incident channels' name prefix (for example `inc-`) with a
+channel rule, so Kopai stays reachable when an alert becomes an incident
+channel. Recommend it only when the token is read-only (no "may create
+alert rules" grant). Keep those channels private: anything Claude
+publishes there, evidence pages included, is visible to anyone who can
+read the channel.
+
+## The message to send your admins
+
+> Hi — we'd like Claude to triage our Kopai alerts in **#{{alert
+> channel}}**, with Kopai's on-call plugin for Claude (kopai-oncall). It
+> needs two one-time steps:
 >
-> 1. At claude.ai/admin-settings/claude-tag (needs Owner role), pair our
->    Slack workspace if it isn't already.
-> 2. Create/extend an access bundle scoped to **#{{on-call channel}}** with
->    **read-only** connections to: Kopai (I'll send you the service-account
->    key separately; allowed website `api.kopai.app`), {{GitHub org}}, and
->    {{pager tool}} (read incidents only — no paging permission yet).
-> 3. Include our on-call repo {{repo URL}} in the bundle, writable, so
->    Claude can read its playbooks, commit log entries and open PRs.
-> 4. Attach the kopai-oncall plugin to the bundle (plugin source:
->    {{Kopai plugin repository}}).
-> 5. Set a spend limit of {{amount}}. (No number yet? A few hundred
->    dollars is a common ceiling for a pilot month — the pilot itself
->    measures the real figure.)
+> **Kopai (an owner or admin):** Alerting › Slack › Add to Slack, choosing #{{alert channel}}; then Tokens › create an `agent` token for Claude Tag.
+> {{Leave "may create alert rules" off. / Switch on "may create alert
+> rules" (owner only).}}
 >
-> Nothing will act autonomously: the plugin is propose-only, everything is
-> read-only, and paging stays off until after a two-week shadow period
-> (Claude only posts drafts to a review channel while humans run on-call
-> as usual) that we review together. Setup guide: claude.com/docs/claude-tag/admins/setup-overview
+> **Claude (Organization settings › Claude Tag › Bundles, an Owner or
+> Claude Tag Admin):** create a bundle `kopai` with a Custom connector
+> (Bearer, Allowed websites `api.kopai.app`, the token — use "Copy setup
+> link for another admin" so the Kopai admin pastes it directly), the
+> `kopai-oncall` plugin, the Instructions text from the plugin's setup
+> guide, and Where it applies: #{{alert channel}}.
+>
+> Please don't connect Kopai by signing in: everyone in the channel would
+> act as you. Claude only reads and proposes; {{it never creates alert
+> rules / it creates a new alert rule only after an explicit yes in the
+> thread}}.
 
 ## Verifying it worked
 
-From the on-call channel:
+The test message in step 5 is the check. If Claude doesn't answer it:
 
-1. `@Claude what can you access from this channel?` — the list should
-   match what the admin attached.
-2. `@Claude read ONCALL.md from {{repo}}` — if it can read the repo, the
-   setup's Phase 4 gate can pass.
-3. `@Claude run a Kopai trace summary for the last hour` — if it returns
-   services, the Kopai connection works.
+1. `@Claude what can you access from this channel?` — Kopai should be in
+   the list.
+2. `@Claude list our Kopai alert rules` — it should answer as the agent
+   token. If it warns that Kopai is connected with someone's own login,
+   the admin used a sign-in: fix it as above.
+3. `@Claude what routines are set up here?` — the Kopai watch should be
+   there; if not, repeat step 4.
 
-If any of these fails, the access bundle is missing that piece — send the admin
-the specific gap, not the whole checklist again.
+Send the admin the specific gap, not the whole checklist again.
+
+## Known limits
+
+Anthropic does not document these yet; the plugin is built so each has a
+fallback.
+
+- **How fast the watch reacts** to a post, and **whether it can reply in
+  each alert's own thread** rather than under its own run. If either
+  fails, the setup skill's `references/watch-routine.md` has a polling
+  routine (every 10 minutes).
+- **Whether the watch pauses** after many top-level posts without a Claude
+  post or a mention, or after about 10 quiet days. Keep the alert channel
+  for alerts.
+- **A revoked or expired token** (401/403): Claude says Kopai refused the
+  token; a Claude admin re-adds the connector with a new one.
+- **Which parts of a Slack post Claude reads.** Claude looks for the
+  Kopai incident link in the post's text and its attachment, and falls
+  back to Kopai's alert list when it finds neither.
+- **Which connector a page calls** when Claude publishes one from Slack.
+  So evidence pages from the channel are snapshots: the numbers are baked
+  in and viewing calls nothing.
+- **Which Kopai tools a session uses** when the bundle's connection and a
+  person's own Kopai connector are both present. Kopai checks every call
+  against the credential that made it, either way.
 
 ## Two gotchas worth knowing up front
 
 - **DMs are different.** A DM with Claude runs on _your_ claude.ai seat
-  with your limits, not the channel's setup. Do on-call work in the
+  with your connectors, not the channel's setup. Do on-call work in the
   channel, where the connections and audit trail live.
 - **Access follows the channel, not the person.** What Claude can reach is
-  decided by which channel you're in. If a probe fails in a thread, you're
-  probably in a channel outside the bundle's scope. The same rule applies
-  to the optional weather routine: the channel it posts to, and the
-  Slack canvas holding its report page, must both be inside the bundle's
-  scope.
+  decided by which channel you're in. If something fails in a thread,
+  you're probably in a channel outside the bundle's **Where it applies**.

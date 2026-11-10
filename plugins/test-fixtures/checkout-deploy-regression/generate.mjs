@@ -45,7 +45,7 @@ const hex = (bytes) =>
   Array.from({ length: bytes }, () =>
     Math.floor(random() * 256)
       .toString(16)
-      .padStart(2, "0")
+      .padStart(2, "0"),
   ).join("");
 
 const MS = 1_000_000n; // nanoseconds per millisecond
@@ -159,7 +159,6 @@ function checkoutRequest(t) {
   });
   cursor += inventoryMs + 3;
 
-  let paymentsClientMs = paymentsMs + 2;
   if (!reservationConflict) {
     span("payments", "3.2.0", {
       traceId,
@@ -175,7 +174,7 @@ function checkoutRequest(t) {
         int("http.response.status_code", 200),
       ],
     });
-    paymentsClientMs = timedOut ? timeoutMs : paymentsMs + 2;
+    const paymentsClientMs = timedOut ? timeoutMs : paymentsMs + 2;
     span("checkout", version, {
       traceId,
       spanId: paymentsClientId,
@@ -328,14 +327,14 @@ function resource(service, version) {
 }
 
 async function post(path, body) {
-  const response = await fetch(`${ENDPOINT}${path}`, {
+  const response = await globalThis.fetch(`${ENDPOINT}${path}`, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(body),
   });
   if (!response.ok) {
     throw new Error(
-      `${path} answered ${response.status}: ${await response.text()}`
+      `${path} answered ${response.status}: ${await response.text()}`,
     );
   }
 }
@@ -380,9 +379,9 @@ for (const { service, version, spans, logs } of batches.values()) {
 
 console.log(
   `Sent ${spanCount} spans and ${logCount} logs to ${ENDPOINT}, ` +
-    `covering ${new Date(windowStart).toISOString()} to ${new Date(now).toISOString()}.`
+    `covering ${new Date(windowStart).toISOString()} to ${new Date(now).toISOString()}.`,
 );
 console.log(
-  `Alert time for ALERT.md: ${new Date(incidentStart + 6 * 60_000).toISOString()}`
+  `Alert time for ALERT.md: ${new Date(incidentStart + 6 * 60_000).toISOString()}`,
 );
 process.exitCode = 0;

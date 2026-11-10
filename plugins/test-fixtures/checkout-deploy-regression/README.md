@@ -41,7 +41,7 @@ You need Node 20 or later and Claude Code.
    cd /tmp/kopai-oncall-dry-run
    git init -q && git add -A && git commit -qm fixture   # so you can diff what Claude writes
    echo '{"mcpServers":{"kopai-local":{"type":"http","url":"http://localhost:8000/mcp"}}}' > mcp.json
-   claude --plugin-dir <path to kopai-mono>/plugins/kopai-oncall \
+   claude --plugin-dir <path to kopai-claude-plugins>/plugins/kopai-oncall \
      --mcp-config mcp.json --strict-mcp-config
    ```
 
