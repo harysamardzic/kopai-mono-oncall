@@ -73,8 +73,8 @@ is easy to miss and expensive when it is real.
 ## Known causes
 
 Check `lessons.md` for entries tagged `#telemetry-gap`. For instrumentation
-fixes, the otel-instrumentation skill (in the kopai-dev plugin) has the
-troubleshooting guides for missing spans, missing attributes and no data.
+fixes, Kopai's otel-instrumentation skill (`npx skills add kopai-app/kopai-mono`)
+has the troubleshooting guides for missing spans, missing attributes and no data.
 
 ## Escalation
 

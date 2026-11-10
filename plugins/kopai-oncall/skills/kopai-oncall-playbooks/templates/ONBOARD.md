@@ -111,7 +111,7 @@ alerts, or threads.
 ## Want the deeper story?
 
 the kopai-oncall plugin's README at
-<https://github.com/kopai-app/kopai-mono/tree/main/plugins/kopai-oncall>
+<https://github.com/kopai-app/kopai-claude-plugins/tree/main/plugins/kopai-oncall>
 (how this was built and why), `ONCALL.md` (the policy —
 thresholds, routing, escalation), `lessons.md` (everything we've learned,
 newest first).

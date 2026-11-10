@@ -5,3 +5,7 @@ pnpm-lock.yaml
 plugins/kopai-oncall/skills/root-cause-analysis
 plugins/kopai-oncall/skills/create-live-page
 plugins/kopai-dev/skills
+
+# Eval mock bodies are returned to Claude verbatim (claude plugin eval).
+plugins/kopai-oncall/evals/**/mocks
+plugins/kopai-oncall/evals/results
